@@ -1,82 +1,64 @@
-// Components
-import { GrFormNext, GrFormPrevious } from "react-icons/gr";
-import { FiSend } from "react-icons/fi";
-import { UserForm } from "./components/UserForm";
-import { ReviewForm } from "./components/ReviewForm";
-import { Thanks } from "./components/Thanks";
-import { Steps } from "./components/Steps";
-// Hooks
-import { useForm } from "./hooks/useForm";
+import { data } from "./data/data";
+
 import { useState } from "react";
 
 import "./App.css";
 
-const formTamplate = {
-  names: "",
-  email: "",
-  review: "",
-  comment: "",
-};
+import { ImcCalc } from "./components/ImcCalc";
+
+import { ImcTable } from "./components/ImcTable";
 
 function App() {
-  const [data, setData] = useState(formTamplate);
+  const calcImc = (e, height, weight) => {
+    e.preventDefault();
 
-  const updateFieldHandler = (key, value) => {
-    setData((prev) => {
-      return { ...prev, [key]: value };
+    if (!weight || !height) return;
+
+    const weightFloat = +weight.replace(",", ".");
+    const heightFloat = +height.replace(",", ".");
+
+    const imcResult = (weightFloat / (heightFloat * heightFloat)).toFixed(1);
+
+    setImc(imcResult);
+
+    data.forEach((item) => {
+      if (imcResult >= item.min && imcResult <= item.max) {
+        setInfo(item.info);
+        setInfoClass(item.infoClass);
+      }
     });
+
+    if (!info) return;
   };
 
-  const formComponents = [
-    <UserForm data={data} updateFieldHandler={updateFieldHandler} />,
-    <ReviewForm data={data} updateFieldHandler={updateFieldHandler} />,
-    <Thanks data={data} />,
-  ];
+  const resetCalc = (e) => {
+    e.preventDefault();
 
-  const {
-    currentStep,
-    currentComponent,
-    changeStep,
-    finish,
-    isLastStep,
-    isFirstStep,
-  } = useForm(formComponents, setData, formTamplate);
+    setImc("");
+    setInfo("");
+    setInfoClass("");
+  };
+
+  const [imc, setImc] = useState("");
+  const [info, setInfo] = useState("");
+  const [infoClass, setInfoClass] = useState("");
 
   return (
-    <div className="app">
-      <div className="header">
-        <h2>Deixe a sua avaliação</h2>
-        <p>
-          Ficamos felizes com a sua compra, utilize o formulário abaixo para
-          avaliar o nosso produto!
-        </p>
+    <>
+      <div className="container">
+        {!imc ? (
+          <ImcCalc calcImc={calcImc} />
+        ) : (
+          <ImcTable
+            data={data}
+            imc={imc}
+            info={info}
+            infoClass={infoClass}
+            resetCalc={resetCalc}
+          />
+        )}
       </div>
-      <div className="form-container">
-        <Steps currentStep={currentStep} />
-        <form onSubmit={(e) => changeStep(currentStep + 1, e)}>
-          <div className="inputs-container">{currentComponent}</div>
-          <div className="actions">
-            {!isFirstStep && (
-              <button type="button" onClick={() => changeStep(currentStep - 1)}>
-                <GrFormPrevious />
-                <span>Voltar</span>
-              </button>
-            )}
-            {!isLastStep ? (
-              <button type="submit">
-                <span>Avançar</span>
-                <GrFormNext />
-              </button>
-            ) : (
-              <button type="button" onClick={finish}>
-                <span>Enviar</span>
-                <FiSend />
-              </button>
-            )}
-          </div>
-        </form>
-      </div>
-    </div>
+    </>
   );
 }
 
