@@ -1,0 +1,47 @@
+.steps{
+   display: flex;
+   gap: 4rem;
+   justify-content: center;
+   align-items: center;
+   max-width: 600px;
+   margin: 0;
+   position: relative;
+   margin-bottom: 2rem;
+}
+
+.steps::after{
+    content: "";
+    width: 380px;
+    border-bottom: 1px solid #000;
+    position: absolute;
+    top: 20px;
+}
+
+.step{
+    text-align: center;
+    background-color: #fff;
+    z-index: 1;
+    width: 200px;
+    padding: 0.5rem;
+}
+
+.step svg{
+    font-size: 1.6rem;
+    margin-bottom: .2rem;
+}
+
+.active, .active2, .active3{
+    font-weight: bold;
+}
+
+.active > svg{
+    fill: #8cdd57;
+}
+
+.active2 > svg{
+    fill: #eecb05;
+}
+
+.active3 > svg {
+    fill: rgb(76, 171, 235);
+}
